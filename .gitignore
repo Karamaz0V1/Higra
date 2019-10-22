@@ -4,5 +4,6 @@ cmake-build*
 dependencies
 .idea
 Testing
+__pycache__
 
 
