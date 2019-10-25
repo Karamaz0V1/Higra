@@ -214,7 +214,7 @@ class TestAttributes(unittest.TestCase):
                           4, 4, 4, 4,
                           4, 4, 4, 4,
                           4, 4, 4, 4,
-                          4, 6, 4, 6, 16), dtype=np.float64)
+                          4, 4, 6, 6, 16), dtype=np.float64)
 
         self.assertTrue(np.all(res == ref))
 
@@ -571,6 +571,14 @@ class TestAttributes(unittest.TestCase):
         ref = np.asarray((3, 3, 0, 0, 10, 10, 2, 2, 10, 0, 10, 3, 10, 2, 10))
 
         res = hg.attribute_dynamics(t, altitudes)
+        self.assertTrue(np.all(res == ref))
+
+    def test_attribute_child_number(self):
+        tree = hg.Tree((5, 5, 6, 6, 6, 7, 7, 7))
+
+        ref = np.asarray((0, 1, 0, 1, 2, 0, 1, -1), dtype=np.int64)
+
+        res = hg.attribute_child_number(tree)
         self.assertTrue(np.all(res == ref))
 
 
