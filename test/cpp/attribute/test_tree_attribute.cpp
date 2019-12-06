@@ -214,4 +214,36 @@ namespace tree_attributes {
         REQUIRE((ref == res));
     }
 
+    TEST_CASE("tree attribute smallest enclosing shape ", "[tree_attributes]") {
+        array_1d<index_t> pt1{8, 8, 9, 9, 9, 10, 10, 11, 13, 12, 11, 12, 13, 13};
+        tree t1(pt1);
+
+        array_1d<index_t> pt2{11, 11, 8, 8, 10, 9, 9, 9, 10, 12, 11, 12, 12};
+        tree t2(pt2);
+
+        array_1d<index_t> ref{0, 1, 2, 3, 4, 5, 6, 7, 11, 10, 9, 9, 12, 12};
+        auto res = attribute_smallest_enclosing_shape(t1, t2);
+        REQUIRE((ref == res));
+    }
+
+    TEST_CASE("tree attribute children pair sum product scalar", "[tree_attributes]") {
+        auto t = data.t; //{5, 5, 6, 6, 6, 7, 7, 7}
+
+        array_1d<double> node_weights{2, 3, 4, 5, 6, 7, 8, 9};
+        auto res = attribute_children_pair_sum_product(t, node_weights);
+        array_1d<double> ref{0, 0, 0, 0, 0, 6, 74, 56};
+        REQUIRE(xt::allclose(ref, res));
+    }
+
+    TEST_CASE("tree attribute children pair sum product vectorial", "[tree_attributes]") {
+        auto t = data.t; //{5, 5, 6, 6, 6, 7, 7, 7}
+
+        array_nd<double> node_weights{2, 9, 3, 8, 4, 7, 5, 6, 6, 5, 7, 4, 8, 3, 9, 2};
+        node_weights.reshape({8, 2});
+        auto res = attribute_children_pair_sum_product(t, node_weights);
+        array_nd<double> ref{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 72, 74, 107, 56, 12};
+        ref.reshape({8, 2});
+        REQUIRE(xt::allclose(ref, res));
+    }
+
 }

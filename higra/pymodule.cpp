@@ -45,7 +45,6 @@ PYBIND11_MODULE(higram, m) {
     py_init_common_hierarchy(m);
     py_init_component_tree(m);
     py_init_contour_2d(m);
-    py_init_dendrogram_purity(m);
     py_init_embedding(m);
     py_init_graph_accumulator(m);
     py_init_graph_image(m);
@@ -63,6 +62,7 @@ PYBIND11_MODULE(higram, m) {
     py_init_tree_accumulator(m);
     py_init_tree_contour_accumulator(m);
     py_init_tree_energy_optimization(m);
+    py_init_tree_fusion(m);
     py_init_tree_graph(m);
     py_init_tree_io(m);
     py_init_tree_of_shapes_image(m);

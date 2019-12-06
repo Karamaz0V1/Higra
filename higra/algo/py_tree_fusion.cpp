@@ -8,9 +8,26 @@
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
 
-#pragma once
+#include "py_tree_fusion.hpp"
+#include "higra/algo/tree_fusion.hpp"
+#include "../py_common.hpp"
+#include "xtensor-python/pyarray.hpp"
+#include "xtensor-python/pytensor.hpp"
 
-#include "pybind11/pybind11.h"
+template<typename T>
+using pyarray = xt::pyarray<T>;
 
-void py_init_dendrogram_purity(pybind11::module &m);
+namespace py = pybind11;
+using namespace hg;
+
+void py_init_tree_fusion(pybind11::module &m) {
+    xt::import_numpy();
+
+    m.def("_tree_fusion_depth_map", [](const std::vector<tree *> &trees) {
+        return tree_fusion_depth_map(trees);
+    });
+
+}
+
+
 
