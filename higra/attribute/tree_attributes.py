@@ -747,3 +747,51 @@ def attribute_moment_of_inertia(tree, leaf_graph):
     I_1 = (miu_20 + miu_02) / (M_00 ** 2)
 
     return I_1
+
+@hg.argument_helper(hg.CptHierarchy)
+@hg.auto_cache
+def attribute_std(tree, vertex_weights, leaf_graph=None):
+    if leaf_graph is not None:
+        vertex_weights = hg.linearize_vertex_weights(vertex_weights, leaf_graph)
+
+    if vertex_weights.ndim > 2:
+        raise ValueError("Vertex weight can either be scalar or 1 dimensional.")
+
+    if vertex_weights.dtype not in (np.float32, np.float64):
+        vertex_weights = vertex_weights.astype(np.float64)
+
+    area = hg.attribute_area(tree, leaf_graph=leaf_graph)
+    mean = hg.accumulate_sequential(tree, vertex_weights, hg.Accumulators.sum, leaf_graph)
+
+    if vertex_weights.ndim == 1:
+        # general case below would work but this is simpler
+        mean /= area
+        mean2 = hg.accumulate_sequential(tree, vertex_weights * vertex_weights, hg.Accumulators.sum, leaf_graph)
+        mean2 /= area
+        variance = mean2 - mean * mean
+    else:
+        mean /= area[:, None]
+        tmp = vertex_weights[:, :, None] * vertex_weights[:, None, :]
+        mean2 = hg.accumulate_sequential(tree, tmp, hg.Accumulators.sum, leaf_graph)
+        mean2 /= area[:, None, None]
+
+        variance = mean2 - mean[:, :, None] * mean[:, None, :]
+
+    return variance
+
+@hg.argument_helper(hg.CptHierarchy)
+@hg.auto_cache
+def attribute_diagonal_of_bbox(tree, leaf_graph):
+
+    coords = hg.attribute_vertex_coordinates(leaf_graph)
+    coords = coords.reshape(-1, coords.shape[-1]).T
+
+    extents = []
+    for axis in coords:
+        axis_min = hg.accumulate_sequential(tree, axis.copy(), hg.Accumulators.min)
+        axis_max = hg.accumulate_sequential(tree, axis.copy(), hg.Accumulators.max)
+        extents += [axis_max - axis_min]
+    extents = np.array(extents)
+
+    return np.sqrt((extents ** 2).sum(axis=0))
+
